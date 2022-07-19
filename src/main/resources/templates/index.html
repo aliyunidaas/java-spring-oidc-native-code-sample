@@ -1,0 +1,76 @@
+<!--
+ * @Author: jiaxu.jia
+ * @Date: 2022-07-11 11:52:24
+ * @LastEditors: jiaxu.jia
+ * @LastEditTime: 2022-07-11 15:45:30
+ * @FilePath: /java-spring-oidc-native-code-sample/src/main/resources/templates/index.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<!--suppress ThymeleafVariablesResolveInspection -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        #header {
+            background-color: #FF6A00;
+            color: #fff;
+            padding: 12px 20px;
+        }
+
+        a {
+            color: #fff;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 0 16px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+        }
+
+        .checked {
+            color: #010101;
+        }
+
+        .p {
+            text-indent: 2em
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="header">
+
+    <a href="/" class="checked">Java OIDC Sample</a>
+
+    <a href="/token/userInfo" id="userInfo">用户信息</a>
+
+    <a href="/token/idToken" id="idToken">ID Token</a>
+
+    <a href="/token/otherInfos" id="other">其他信息</a>
+
+</div>
+<div class="container">
+
+    <div style="margin-left: 40px;margin-top: 30px;margin-bottom: 10px">
+        <h2>Java OIDC Sample</h2>
+        <p class="p">This example mainly includes Authorization Code Flow and Authorization Code With PKCE Flow.</p>
+
+    </div>
+
+</div>
+
+<script type="text/javascript">
+</script>
+</body>
+</html>

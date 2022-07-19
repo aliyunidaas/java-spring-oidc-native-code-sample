@@ -1,0 +1,22 @@
+server:
+    port: 8082
+    servlet:
+        context-path: /
+spring:
+    thymeleaf:
+        encoding: UTF-8
+        cache: false
+        mode: HTML5
+logging:
+    level:
+        root: INFO
+
+idaas:
+    oidc:
+#        openPkce : false
+#        codeChallengeMethod: S256
+        clientId: # IDaaS应用中拿到的 client_id
+        clientSecret:  # IDaaS应用中拿到的 client_secret
+        issuer: # IDaaS应用中拿到的Issuer
+        scopes: # IDaaS应用中配置的scopes
+        redirectUri: ${baseUri}/authentication/login #登录 Redirect URI

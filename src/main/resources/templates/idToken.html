@@ -1,0 +1,182 @@
+<!--
+ * @Author: jiaxu.jia
+ * @Date: 2022-07-11 11:52:24
+ * @LastEditors: jiaxu.jia
+ * @LastEditTime: 2022-07-11 15:45:05
+ * @FilePath: /java-spring-oidc-native-code-sample/src/main/resources/templates/index.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<!--suppress ThymeleafVariablesResolveInspection -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        .demo-title {
+            margin-right: 8px;
+        }
+
+        #header {
+            background-color: #FF6A00;
+            color: #fff;
+            padding: 12px 20px;
+        }
+
+        a {
+            color: #fff;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 0 16px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+        }
+
+        #right {
+            width: 100%;
+            padding: 10px 120px 110px;
+        }
+
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #FF6A00;
+            color: #fff;
+            text-align: center;
+            padding: 12px 0;
+        }
+
+        .wrapper {
+            width: 100%;
+            padding-bottom: 34px;
+            border-radius: 4px;
+            background-color: #F8F7F7;
+        }
+
+        .wrapper:hover {
+            box-shadow: 1px 3px 18px #999;;
+        }
+
+        .list-item {
+            display: flex;
+            flex-direction: row;
+            padding: 10px 30px;
+            line-height: 32px;
+            border-bottom: 1px solid #e6e3e3;
+        }
+
+        .list-item-title {
+            font-weight: bold;
+            color: #fff;
+            background-color: #FF6A00;
+        }
+
+        .t-item {
+            display: inline-block;
+            min-width: 180px;
+            font-weight: bold;
+        }
+
+        .item {
+            columns: #303030;
+            word-break: break-all;
+        }
+
+        #id-token-container {
+            padding-bottom: 32px;
+        }
+
+        .checked {
+            color: #010101;
+        }
+    </style>
+</head>
+<body>
+
+<div id="header">
+
+    <a href="/" class="demo-title">Java OIDC Sample</a>
+
+    <a href="/token/userInfo" id="userInfo">用户信息</a>
+
+    <span class="checked">ID Token</span>
+
+    <a href="/token/otherInfos" id="other">其他信息</a>
+
+</div>
+<div class="container">
+    <div id="right">
+
+        <div id="id-token-container">
+
+            <div>
+                <b style="margin-top: 30px">此次登录方式为：</b>
+                <b th:text="${title}"></b>
+                <p> Id Token 信息如下所示：</p>
+            </div>
+
+            <div class="wrapper" id="idToken">
+                <div th:if="${payload}" !=null>
+                    <div class="list-item list-item-title">
+                        <span class="t-item">Claim</span>
+                        <span class="item">Value</span>
+                    </div>
+                    <div class="list-item" th:if="${payload.sub}" !=null>
+                        <span class="t-item">sub</span>
+                        <span class="item" th:text="${payload.sub}"></span>
+                    </div>
+                    <div class="list-item" th:if="${payload.aud}" !=null>
+                        <span class="t-item">aud</span>
+                        <span class="item" th:text="${payload.aud}"></span>
+                    </div>
+                    <div class="list-item" th:if="${payload.name}" !=null>
+                        <span class="t-item">name</span>
+                        <span class="item" th:text="${payload.name}"></span>
+                    </div>
+                    <div class="list-item" th:if="${payload.preferred_username}" !=null>
+                        <span class="t-item">preferred_username</span>
+                        <span class="item" th:text="${payload.preferred_username}"></span>
+                    </div>
+                    <div class="list-item" th:if="${payload.exp}" !=null>
+                        <span class="t-item">exp</span>
+                        <span class="item" th:text="${#dates.format(payload.exp*1000L,'yyyy-MM-dd hh:mm:ss')}"></span>
+                    </div>
+                    <div class="list-item" th:if="${payload.iat}" !=null>
+                        <span class="t-item">iat</span>
+                        <span class="item" th:text="${#dates.format(payload.iat*1000L,'yyyy-MM-dd hh:mm:ss')}"></span>
+                    </div>
+                    <div class="list-item" th:if="${payload.jti}" !=null>
+                        <span class="t-item">jti</span>
+                        <span class="item" th:text="${payload.jti}"></span>
+                    </div>
+                    <div class="list-item" th:if="${payload.at_hash}" !=null>
+                        <span class="t-item">at_hash</span>
+                        <span class="item" th:text="${payload.at_hash}"></span>
+                    </div>
+                    <div class="list-item" th:if="${payload.c_hash}" !=null>
+                        <span class="t-item">c_hash</span>
+                        <span class="item" th:text="${payload.c_hash}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="footer">@IDaaS - OIDC Demo</div>
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>
