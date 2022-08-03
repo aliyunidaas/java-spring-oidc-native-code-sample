@@ -1,28 +1,32 @@
 package com.aliyunidaas.sample.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.aliyunidaas.sample.common.EndpointContext;
 import com.aliyunidaas.sample.common.cache.CacheManager;
+import com.aliyunidaas.sample.common.config.CustomOidcConfiguration;
 import com.aliyunidaas.sample.common.factory.ParameterNameFactory;
 import com.aliyunidaas.sample.common.util.CommonUtil;
+import com.aliyunidaas.sample.domain.StateObject;
+import com.aliyunidaas.sample.domain.TokenEndpointResponse;
+import com.aliyunidaas.sample.domain.UserInfoEndpointResponse;
 import com.aliyunidaas.sample.service.LoginService;
-import com.aliyunidaas.sample.service.UserInfoService;
+import com.aliyunidaas.sample.service.impl.UserInfoServiceImpl;
+import org.jose4j.jwk.HttpsJwks;
 import org.jose4j.jwt.JwtClaims;
-import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
+import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,84 +46,97 @@ public class LoginController {
     private LoginService loginService;
 
     @Autowired
-    private UserInfoService userInfoService;
+    private UserInfoServiceImpl userInfoService;
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private CustomOidcConfiguration customOidcConfiguration;
 
     /**
      * Process authorization responses.  A successful login will redirect to the user's redirect-uri address.
      * Take the authorization code and send it to the token endpoint using the HTTP POST method.
      *
-     * @param authenticationCode authorization code
-     * @param state              用于作为缓存的key值，在授权码流中也可用于防止攻击
-     * @param model              the model to be passed to the view.
-     * @return which view to display.
+     * @param response
+     * @param authenticationCode
+     * @param state
+     * @return
+     * @throws IOException
      */
     @RequestMapping(value = "/authentication/login", method = {RequestMethod.POST, RequestMethod.GET})
-    public String login(HttpServletRequest request,
-                        HttpServletResponse response,
+    public String login(HttpServletResponse response,
                         @RequestParam("code") String authenticationCode,
-                        @RequestParam("state") String state,
-                        Model model) throws IOException {
-        String redirectUri = state.split(":")[0];
-        String cacheKey = state.split(":")[1];
+                        @RequestParam("state") String state) throws IOException {
 
         LOGGER.info("=== Authentication Code === : {}", authenticationCode);
-        String token = loginService.getToken(request, authenticationCode, cacheKey);
-        JSONObject rawTokenObject = JSON.parseObject(token, JSONObject.class);
-        LOGGER.info("==== Raw Token information ==== :{}", token);
+        TokenEndpointResponse tokenEndpointResponse = loginService.swapCodeFromTokenEndpoint(authenticationCode, state);
+        LOGGER.info("==== Raw Token information ==== :{}", JSON.toJSONString(tokenEndpointResponse));
 
-        final String accessToken = (String)rawTokenObject.get(ParameterNameFactory.ACCESS_TOKEN);
-        String userInfo = userInfoService.getUserInfo(accessToken);
-        LOGGER.info("==== User Info information ==== :{}", userInfo);
+        final String accessToken = tokenEndpointResponse.getAccessToken();
+        UserInfoEndpointResponse userInfo = userInfoService.getUserInfo(accessToken);
+        LOGGER.info("==== User Info information ==== :{}", JSON.toJSONString(userInfo));
 
         String cookieValue = UUID.randomUUID().toString();
         CommonUtil.setCookie(response, ParameterNameFactory.COOKIE_NAME, cookieValue);
-        writeSessionAttribute(rawTokenObject, authenticationCode, userInfo, cookieValue);
-
-        return "redirect:" + redirectUri;
-
+        writeSessionAttribute(tokenEndpointResponse, authenticationCode, userInfo, cookieValue);
+        String callBackUri = cacheManager.getCache(CommonUtil.generateCacheKey(state, ParameterNameFactory.URI));
+        return "redirect:" + callBackUri;
     }
 
     /**
      * the information to display on the page and store
      *
-     * @param rawTokenObject     token端点返回的信息
-     * @param authenticationCode authorization code
-     * @param userInfo           information returned by the user endpoint
+     * @param tokenEndpointResponse token端点返回的信息
+     * @param authenticationCode    authorization code
+     * @param userInfoEndpointDTO   用户信息端点返回的数据
      */
-    private void writeSessionAttribute(JSONObject rawTokenObject, String authenticationCode, String userInfo, String cookieValue) {
-        final String accessToken = (String)rawTokenObject.get(ParameterNameFactory.ACCESS_TOKEN);
-        final String idToken = (String)rawTokenObject.get(ParameterNameFactory.ID_TOKEN);
+    private void writeSessionAttribute(TokenEndpointResponse tokenEndpointResponse, String authenticationCode,
+                                       UserInfoEndpointResponse userInfoEndpointDTO,
+                                       String cookieValue) {
+        final String accessToken = tokenEndpointResponse.getAccessToken();
+        final String idToken = tokenEndpointResponse.getIdToken();
         Map<String, Object> idTokenClaimsMap = getIdTokenClaimsMap(idToken);
-        final String refreshToken = (String)rawTokenObject.get(ParameterNameFactory.REFRESH_TOKEN);
-        JSONObject userMessage = JSON.parseObject(userInfo, JSONObject.class);
+        final String refreshToken = tokenEndpointResponse.getRefreshToken();
 
-        cacheManager.setCache(CommonUtil.generateCacheKey(cookieValue, ParameterNameFactory.AUTHORIZATION_CODE), authenticationCode);
-        cacheManager.setCache(CommonUtil.generateCacheKey(cookieValue, ParameterNameFactory.ACCESS_TOKEN), accessToken);
-        cacheManager.setCache(CommonUtil.generateCacheKey(cookieValue, ParameterNameFactory.ID_TOKEN), idTokenClaimsMap);
-        cacheManager.setCache(CommonUtil.generateCacheKey(cookieValue, ParameterNameFactory.REFRESH_TOKEN), refreshToken);
-        cacheManager.setCache(CommonUtil.generateCacheKey(cookieValue, ParameterNameFactory.USER_INFO), userMessage);
+        StateObject stateObject = StateObject
+                .getBuilder()
+                .setAuthorizationCode(authenticationCode)
+                .setAccessToken(accessToken)
+                .setIdTokenClaimsMap(idTokenClaimsMap)
+                .setRefreshToken(refreshToken)
+                .setUserInfo(userInfoEndpointDTO)
+                .build();
+        cacheManager.setCache(cookieValue, stateObject);
         cacheManager.setCache(CommonUtil.generateCacheKey(cookieValue, ParameterNameFactory.COOKIE_NAME), cookieValue);
     }
 
+    /**
+     * (1)在授权码或者PKCE授权码模式下可以不验证,可采用setSkipSignatureVerification跳过验签
+     *    i.如需要验签，若验证签名中的jwksUri由第三方提供提供，则存在ssrf的风险，这个是需要注意的
+     * (2)隐式流一定要验签名，因为经过了前端，可以篡改【demo不涉及隐式流】
+     *
+     * @param idToken
+     * @return
+     */
     private Map<String, Object> getIdTokenClaimsMap(String idToken) {
         try {
+            EndpointContext endpointContext = cacheManager.getCache(customOidcConfiguration.getIssuer());
+            String jwksUri = endpointContext.getJwksUri();
+            HttpsJwks httpsJwks = new HttpsJwks(new URI(jwksUri).toASCIIString());
             JwtConsumer jwtConsumer = new JwtConsumerBuilder()
                     .setRequireExpirationTime()
                     .setRequireJwtId()
                     .setRequireIssuedAt()
                     .setRequireExpirationTime()
                     .setAllowedClockSkewInSeconds(60)
-                    .setSkipSignatureVerification()
-                    .setSkipDefaultAudienceValidation()
+                    .setVerificationKeyResolver(new HttpsJwksVerificationKeyResolver(httpsJwks))
+                    .setExpectedAudience(customOidcConfiguration.getClientId())
                     .build();
             JwtClaims jwtClaims = jwtConsumer.processToClaims(idToken);
             return jwtClaims.getClaimsMap();
-        } catch (InvalidJwtException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
 }

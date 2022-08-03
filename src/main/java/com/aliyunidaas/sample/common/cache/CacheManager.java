@@ -9,7 +9,7 @@ package com.aliyunidaas.sample.common.cache;
  **/
 public interface CacheManager {
     /**
-     * set cache
+     * 设置缓存
      *
      * @param cacheKey 缓存key
      * @param cacheValue 缓存value
@@ -17,7 +17,7 @@ public interface CacheManager {
     void setCache(String cacheKey, Object cacheValue);
 
     /**
-     * get cache
+     * 获取缓存
      *
      * @param cacheKey 缓存key
      * @return value

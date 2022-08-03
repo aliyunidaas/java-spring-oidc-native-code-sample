@@ -27,6 +27,5 @@ public class WebAppConfigurer implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(simpleAuthnInterceptor())
                 .addPathPatterns("/token/**");
-
     }
 }

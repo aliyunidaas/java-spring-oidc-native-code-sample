@@ -60,11 +60,14 @@
 
     <div th:fragment="content" style="margin: 30px">
         <p>This page displays the Exception message</p>
-        <b th:if="${error}" !=null>error: </b>
+        <b th:if="${error}!=null">error: </b>
         <b th:text="${error}"></b>
         <br/>
-        <b th:if="${description}" !=null>description: </b>
+        <b th:if="${description}!=null">description: </b>
         <b th:text="${description}"></b>
+        <br/>
+        <b th:if="${detail}!=null">detail: </b>
+        <b th:text="${detail}"></b>
     </div>
 
 </div>

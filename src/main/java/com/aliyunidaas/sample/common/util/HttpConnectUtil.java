@@ -9,7 +9,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +20,6 @@ import java.nio.charset.StandardCharsets;
  * @date: 2022/7/5 2:51 PM
  * @author: longqiuling
  **/
-@Component
 public class HttpConnectUtil {
     /**
      * a Get request without parameters
@@ -29,7 +27,7 @@ public class HttpConnectUtil {
      * @param endpoint 请求端点
      * @return 请求返回值
      */
-    public String doGetConnect(String endpoint) throws IOException {
+    public static String doGetConnect(String endpoint) throws IOException {
         HttpGet httpGet = new HttpGet(endpoint);
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(httpGet)) {
@@ -42,7 +40,6 @@ public class HttpConnectUtil {
         } catch (BizException bizException) {
             throw new BizException(bizException.getError(), bizException.getDescription());
         }
-
     }
 
     /**
@@ -51,7 +48,7 @@ public class HttpConnectUtil {
      * @param httpPost 请求体
      * @return 请求返回值
      */
-    public String doPostConnect(HttpPost httpPost) throws IOException {
+    public static String doPostConnect(HttpPost httpPost) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(httpPost)) {
             HttpEntity entity = response.getEntity();
@@ -70,7 +67,7 @@ public class HttpConnectUtil {
      * @param response
      * @return
      */
-    private boolean isFail(CloseableHttpResponse response) {
+    private static boolean isFail(CloseableHttpResponse response) {
         return response.getStatusLine().getStatusCode() != 200;
     }
 
@@ -78,7 +75,7 @@ public class HttpConnectUtil {
      * 解析失败请求的原因
      * @param result
      */
-    public void responseError(String result) {
+    public static void responseError(String result) {
         BizException bizException = JSON.parseObject(result, BizException.class);
         if (bizException.getError() != null) {
             throw new BizException(bizException.getError(), bizException.getDescription());

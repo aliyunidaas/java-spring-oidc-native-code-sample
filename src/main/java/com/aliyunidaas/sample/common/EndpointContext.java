@@ -15,6 +15,8 @@ public class EndpointContext {
 
     private String userinfoEndpoint;
 
+    private String jwksUri;
+
     public EndpointContext() {
     }
 
@@ -42,41 +44,12 @@ public class EndpointContext {
         this.userinfoEndpoint = userinfoEndpoint;
     }
 
-    public static EndpointContextBuilder getBuilder() {
-        return EndpointContextBuilder.anEndpointContext();
+    public String getJwksUri() {
+        return jwksUri;
     }
 
-    public static final class EndpointContextBuilder {
-        private String authorizationEndpoint;
-        private String tokenEndpoint;
-        private String userinfoEndpoint;
-
-        private EndpointContextBuilder() {}
-
-        public static EndpointContextBuilder anEndpointContext() {return new EndpointContextBuilder();}
-
-        public EndpointContextBuilder setAuthorizationEndpoint(String authorizationEndpoint) {
-            this.authorizationEndpoint = authorizationEndpoint;
-            return this;
-        }
-
-        public EndpointContextBuilder setTokenEndpoint(String tokenEndpoint) {
-            this.tokenEndpoint = tokenEndpoint;
-            return this;
-        }
-
-        public EndpointContextBuilder setUserinfoEndpoint(String userinfoEndpoint) {
-            this.userinfoEndpoint = userinfoEndpoint;
-            return this;
-        }
-
-        public EndpointContext build() {
-            EndpointContext endpointContext = new EndpointContext();
-            endpointContext.setAuthorizationEndpoint(authorizationEndpoint);
-            endpointContext.setTokenEndpoint(tokenEndpoint);
-            endpointContext.setUserinfoEndpoint(userinfoEndpoint);
-            return endpointContext;
-        }
+    public void setJwksUri(String jwksUri) {
+        this.jwksUri = jwksUri;
     }
 }
 

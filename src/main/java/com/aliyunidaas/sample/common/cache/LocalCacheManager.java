@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Copyright (c)  Alibaba Cloud Computing
- * Description:  This project is a demo example. It is recommended to use cache middleware (redis) for storage in the project
+ * Description:  本示例为demo演示示例，在实际项目中建议使用第三方缓存（如redis）
  *
  * @date: 2022/6/30 10:11 AM
  * @author: longqiuling

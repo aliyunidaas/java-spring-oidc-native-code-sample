@@ -56,6 +56,7 @@
             text-align: center;
             padding: 12px 0;
         }
+
         .wrapper {
             width: 100%;
             padding-bottom: 34px;
@@ -136,8 +137,8 @@
                     <span class="t-item">access token</span>
                     <span class="item" th:text="${access_token}"></span>
                 </div>
-                <div class="list-item">
-                    <span class="t-item" th:if="${refresh_token}" !=null>refresh token</span>
+                <div class="list-item" th:if="${refresh_token}">
+                    <span class="t-item">refresh token</span>
                     <span class="item" th:text="${refresh_token}"></span>
                 </div>
             </div>

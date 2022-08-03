@@ -122,37 +122,36 @@
                 <p> 用户信息如下所示：</p>
             </div>
             <div class="wrapper" id="userInfo">
-                <div th:if="${userInfo}" !=null>
-                    <div class="list-item list-item-title">
-                        <span class="t-item">Claim</span>
-                        <span class="item">Value</span>
-                    </div>
-                    <div class="list-item" th:if="${userInfo.sub}" !=null>
-                        <span class="t-item">sub</span>
-                        <span class="item" th:text="${userInfo.sub}"></span>
-                    </div>
 
-                    <div class="list-item" th:if="${userInfo.name}" !=null>
-                        <span class="t-item">name</span>
-                        <span class="item" th:text="${userInfo.name}"></span>
-                    </div>
-                    <div class="list-item" th:if="${userInfo.preferred_username}" !=null>
-                        <span class="t-item">preferred_username</span>
-                        <span class="item" th:text="${userInfo.preferred_username}"></span>
-                    </div>
-                    <div class="list-item" th:if="${userInfo.email}" !=null>
-                        <span class="t-item">email</span>
-                        <span class="item" th:text="${userInfo.email}"></span>
-                    </div>
+                <div class="list-item list-item-title">
+                    <span class="t-item">Claim</span>
+                    <span class="item">Value</span>
                 </div>
+                <div class="list-item" th:if="${sub}" >
+                    <span class="t-item">sub</span>
+                    <span class="item" th:text="${sub}"></span>
+                </div>
+
+                <div class="list-item" th:if="${name}" >
+                    <span class="t-item">name</span>
+                    <span class="item" th:text="${name}"></span>
+                </div>
+                <div class="list-item" th:if="${preferred_username}" >
+                    <span class="t-item">preferred_username</span>
+                    <span class="item" th:text="${preferred_username}"></span>
+                </div>
+                <div class="list-item" th:if="${email}" >
+                    <span class="t-item">email</span>
+                    <span class="item" th:text="${email}"></span>
+                </div>
+
             </div>
         </div>
     </div>
-</div>
-<div id="footer">@IDaaS - OIDC Demo</div>
+    <div id="footer">@IDaaS - OIDC Demo</div>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
-</script>
+    </script>
 </body>
 </html>

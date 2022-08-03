@@ -10,13 +10,16 @@ spring:
 logging:
     level:
         root: INFO
+custom:
+    serverDomain: http://127.0.0.1:${server.port}
 
 idaas:
     oidc:
-#        openPkce : false
+#        pkceRequired : true
 #        codeChallengeMethod: S256
-        clientId: # IDaaS应用中拿到的 client_id
-        clientSecret:  # IDaaS应用中拿到的 client_secret
-        issuer: # IDaaS应用中拿到的Issuer
-        scopes: # IDaaS应用中配置的scopes
-        redirectUri: ${baseUri}/authentication/login #登录 Redirect URI
+        client-id:  # IDaaS应用中拿到的 client_id
+        client-secret: # IDaaS应用中拿到的 client_secret
+        issuer:  # IDaaS应用中拿到的Issuer
+#        scopes: openid # IDaaS应用中配置的scopes
+        redirect-uri: ${custom.serverDomain}/authentication/login #登录 Redirect URI
+

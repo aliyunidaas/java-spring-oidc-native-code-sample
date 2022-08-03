@@ -126,44 +126,44 @@
             </div>
 
             <div class="wrapper" id="idToken">
-                <div th:if="${payload}" !=null>
+                <div th:if="${payload}" >
                     <div class="list-item list-item-title">
                         <span class="t-item">Claim</span>
                         <span class="item">Value</span>
                     </div>
-                    <div class="list-item" th:if="${payload.sub}" !=null>
+                    <div class="list-item" th:if="${payload.sub}">
                         <span class="t-item">sub</span>
                         <span class="item" th:text="${payload.sub}"></span>
                     </div>
-                    <div class="list-item" th:if="${payload.aud}" !=null>
+                    <div class="list-item" th:if="${payload.aud}">
                         <span class="t-item">aud</span>
                         <span class="item" th:text="${payload.aud}"></span>
                     </div>
-                    <div class="list-item" th:if="${payload.name}" !=null>
+                    <div class="list-item" th:if="${payload.name}">
                         <span class="t-item">name</span>
                         <span class="item" th:text="${payload.name}"></span>
                     </div>
-                    <div class="list-item" th:if="${payload.preferred_username}" !=null>
+                    <div class="list-item" th:if="${payload.preferred_username}">
                         <span class="t-item">preferred_username</span>
                         <span class="item" th:text="${payload.preferred_username}"></span>
                     </div>
-                    <div class="list-item" th:if="${payload.exp}" !=null>
+                    <div class="list-item" th:if="${payload.exp}">
                         <span class="t-item">exp</span>
                         <span class="item" th:text="${#dates.format(payload.exp*1000L,'yyyy-MM-dd hh:mm:ss')}"></span>
                     </div>
-                    <div class="list-item" th:if="${payload.iat}" !=null>
+                    <div class="list-item" th:if="${payload.iat}">
                         <span class="t-item">iat</span>
                         <span class="item" th:text="${#dates.format(payload.iat*1000L,'yyyy-MM-dd hh:mm:ss')}"></span>
                     </div>
-                    <div class="list-item" th:if="${payload.jti}" !=null>
+                    <div class="list-item" th:if="${payload.jti}">
                         <span class="t-item">jti</span>
                         <span class="item" th:text="${payload.jti}"></span>
                     </div>
-                    <div class="list-item" th:if="${payload.at_hash}" !=null>
+                    <div class="list-item" th:if="${payload.at_hash}">
                         <span class="t-item">at_hash</span>
                         <span class="item" th:text="${payload.at_hash}"></span>
                     </div>
-                    <div class="list-item" th:if="${payload.c_hash}" !=null>
+                    <div class="list-item" th:if="${payload.c_hash}">
                         <span class="t-item">c_hash</span>
                         <span class="item" th:text="${payload.c_hash}"></span>
                     </div>

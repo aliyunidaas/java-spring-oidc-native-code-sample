@@ -7,13 +7,15 @@
 ## 第二步：修改配置
 修改application.yaml文件中的 idp 配置
 ```yaml
+custom:
+  serverDomain: # 填写当前运行的域名地址
 idaas:
     oidc:   
         clientId:  # IDaaS应用中拿到的 client_id
         clientSecret:  # IDaaS应用中拿到的 client_secret
         issuer: # IDaaS应用中拿到的Issuer
         scopes: # IDaaS应用中配置的scopes
-        redirectUri: ${baseUri}/authentication/login #登录 Redirect URI
+        redirectUri: ${custom.serverDomain}/authentication/login #登录 Redirect URI
 ```
 application.yaml中的配置项分别对应IDaaS应用中的配置
 ![img_3.png](src/main/resources/static/img/img_3.png)
@@ -22,7 +24,7 @@ application.yaml中的配置项分别对应IDaaS应用中的配置
 其中，redirectUri在当前项目中指向了/authentication/login
 ## 第三步：在 IDaaS 中添加重定向地址redirect-uri
 - 因为要最终需要到LoginController接口中拿到access token令牌，故重定向地址为LoginController内的login方法所指向的uri，将其填写到IDaaS中。
-  - {baseUri}/authentication/login
+  - http://127.0.0.1:8082/authentication/login
 
 ## 第四步：添加授权
 ### 添加授权
@@ -62,7 +64,7 @@ application.yaml中的配置项分别对应IDaaS应用中的配置
 ```yaml
 idaas:
     oidc:
-        openPkce: true #打开PKCE
+        pkceRequired: true #打开PKCE
         codeChallengeMethod: S256 #加密算法
 ```
 ## 访问

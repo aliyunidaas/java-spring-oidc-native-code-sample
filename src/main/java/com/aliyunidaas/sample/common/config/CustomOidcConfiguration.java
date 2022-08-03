@@ -2,8 +2,13 @@ package com.aliyunidaas.sample.common.config;
 
 import com.aliyunidaas.sample.common.factory.CodeChallengeMethodFactory;
 import com.aliyunidaas.sample.common.factory.ParameterNameFactory;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Copyright (c)  Alibaba Cloud Computing
@@ -16,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("idaas.oidc")
 public class CustomOidcConfiguration {
 
-    private boolean openPkce = false;
+    private boolean pkceRequired = false;
 
     private String codeChallengeMethod = CodeChallengeMethodFactory.SHA_256;
 
@@ -33,12 +38,41 @@ public class CustomOidcConfiguration {
     public CustomOidcConfiguration() {
     }
 
-    public boolean isOpenPkce() {
-        return openPkce;
+    @PostConstruct
+    private void valid() throws Exception {
+        if (StringUtils.isBlank(clientId)) {
+            throw new Exception(ParameterNameFactory.CLIENT_ID_IS_NULL);
+        }
+        if (StringUtils.isBlank(clientSecret)) {
+            throw new Exception(ParameterNameFactory.CLIENT_SECRET_IS_NULL);
+        }
+        if (StringUtils.isBlank(issuer)) {
+            throw new Exception(ParameterNameFactory.ISSUER_IS_NULL);
+        }
+        if (StringUtils.isBlank(redirectUri)) {
+            throw new Exception(ParameterNameFactory.REDIRECT_URI_IS_NULL);
+        }
+        validRedirectUri();
     }
 
-    public void setOpenPkce(boolean openPkce) {
-        this.openPkce = openPkce;
+    private void validRedirectUri() throws Exception {
+        URI uri = null;
+        try {
+            uri = new URI(redirectUri);
+        } catch (URISyntaxException e) {
+            throw new Exception(ParameterNameFactory.REDIRECT_URI_IS_VALID);
+        }
+        if (uri.getHost() == null) {
+            throw new Exception(ParameterNameFactory.REDIRECT_URI_IS_VALID);
+        }
+    }
+
+    public boolean isPkceRequired() {
+        return pkceRequired;
+    }
+
+    public void setPkceRequired(boolean pkceRequired) {
+        this.pkceRequired = pkceRequired;
     }
 
     public String getCodeChallengeMethod() {

@@ -1,10 +1,10 @@
 package com.aliyunidaas.sample.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.io.IOException;
 
 /**
  * Copyright (c)  Alibaba Cloud Computing
@@ -16,32 +16,29 @@ import java.io.IOException;
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+
     private static final String ERROR = "error";
 
     private static final String ERROR_DESCRIPTION = "description";
 
-    @ExceptionHandler({IOException.class})
-    public String ioException(IOException ex,Model model) {
-        model.addAttribute(ERROR, ex.getMessage());
-        return "/error";
-    }
+    private static final String ERROR_DETAIL = "detail";
 
     @ExceptionHandler({BizException.class})
     public String bizException(BizException ex, Model model) {
         model.addAttribute(ERROR, ex.getError());
         model.addAttribute(ERROR_DESCRIPTION, ex.getDescription());
+        model.addAttribute(ERROR_DETAIL, ex);
+        LOGGER.error("BizException:{}, error:{}, description:{} ", ex, ex.getError(), ex.getDescription());
         return "/error";
     }
 
-    @ExceptionHandler({IllegalAccessException.class})
-    public String illegalAccessException(IllegalAccessException ex, Model model) {
+    @ExceptionHandler({Exception.class})
+    public String exception(Exception ex, Model model) {
         model.addAttribute(ERROR, ex.getMessage());
+        model.addAttribute(ERROR_DETAIL, ex);
+        LOGGER.error("Exception:", ex);
         return "/error";
     }
 
-    @ExceptionHandler({RuntimeException.class})
-    public String runtimeException(RuntimeException ex, Model model) {
-        model.addAttribute(ERROR, ex.getMessage());
-        return "/error";
-    }
 }
