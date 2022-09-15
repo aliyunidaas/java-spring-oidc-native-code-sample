@@ -7,19 +7,38 @@ spring:
         encoding: UTF-8
         cache: false
         mode: HTML5
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        show-sql: true
+        hibernate:
+            # #  每次重新启动后数据库都会被清空
+            ddl-auto: create
+    datasource:
+        url: jdbc:h2:./temp/data/myDB:~sync;DB_CLOSE_ON_EXIT=FALSE
+        username: admin
+        password: ##数据库密码
+        driver-class-name: org.h2.Driver
 logging:
     level:
         root: INFO
 custom:
-    serverDomain: http://127.0.0.1:${server.port}
+    server-domain: http://127.0.0.1:${server.port}
+    developer-api-endpoint: eiam-developerapi.cn-hangzhou.aliyuncs.com
 
 idaas:
-    oidc:
-#        pkceRequired : true
-#        codeChallengeMethod: S256
-        client-id:  # IDaaS应用中拿到的 client_id
-        client-secret: # IDaaS应用中拿到的 client_secret
+    instance-id:  # 实例ID
+    application-id:  # 应用ID
+    oidc-config:
+        pkce-required: true # 是否采用PKCE授权码模式
+        code-challenge-method: S256 # 如果选用PKCE授权码模式，选择其CodeChallenge可选S256、plain
+        client-id:  # IDaaS应用中拿到的client_id
+        client-secret:  # IDaaS应用中拿到的client_secret
         issuer:  # IDaaS应用中拿到的Issuer
-#        scopes: openid # IDaaS应用中配置的scopes
-        redirect-uri: ${custom.serverDomain}/authentication/login #登录 Redirect URI
-
+        scopes: openid # IDaaS应用中配置的scopes
+        redirect-uri: ${custom.server-domain}/authentication/login # 登录RedirectURI
+    sync-config:
+        enabled: true # 同步到账户开关是否开启
+        callback-uri: ${custom.server-domain}/receive_sync # 同步回调接收地址
+        encrypt-required: true # 是否加密传输
+        encrypt-key:  # IDaaS应用中对应的加密密钥
+        jwks-uri: # 验证签名地址

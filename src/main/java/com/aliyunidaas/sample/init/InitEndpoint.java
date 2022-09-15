@@ -3,8 +3,11 @@ package com.aliyunidaas.sample.init;
 import com.alibaba.fastjson.JSON;
 import com.aliyunidaas.sample.common.EndpointContext;
 import com.aliyunidaas.sample.common.cache.CacheManager;
-import com.aliyunidaas.sample.common.config.CustomOidcConfiguration;
+import com.aliyunidaas.sample.common.config.InitConfiguration;
 import com.aliyunidaas.sample.common.util.HttpConnectUtil;
+import com.aliyunidaas.sample.remote.EventDataCallbackHandler;
+import com.aliyunidaas.sync.event.runner.EventDataRunner;
+import com.aliyunidaas.sync.log.DefaultSimpleLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,18 +30,29 @@ public class InitEndpoint {
     private final static String DISCOVER_ENDPOINT = "/.well-known/openid-configuration";
 
     @Autowired
-    private CustomOidcConfiguration customOidcConfiguration;
+    private InitConfiguration initConfiguration;
 
     @Autowired
     private CacheManager cacheManager;
 
+    @Autowired
+    private EventDataCallbackHandler eventDataCallbackHandler;
+
     @PostConstruct
     public void init() throws IOException {
-        EndpointContext endpointContext = cacheManager.getCache(customOidcConfiguration.getIssuer());
+        final InitConfiguration.OidcConfig oidcConfig = initConfiguration.getOidcConfig();
+        EndpointContext endpointContext = cacheManager.getCache(oidcConfig.getIssuer());
         if (endpointContext == null) {
-            String discoveryEndpoint = customOidcConfiguration.getIssuer() + DISCOVER_ENDPOINT;
+            String discoveryEndpoint = oidcConfig.getIssuer() + DISCOVER_ENDPOINT;
             cacheEndpoint(discoveryEndpoint);
         }
+        final InitConfiguration.SyncConfig syncConfig = initConfiguration.getSyncConfig();
+        final EventDataRunner eventDataRunner = new EventDataRunner();
+        eventDataRunner.setEncryptKey(syncConfig.getEncryptKey());
+        eventDataRunner.setJwkUrl(syncConfig.getJwksUri());
+        eventDataRunner.setAppId(initConfiguration.getApplicationId());
+        eventDataRunner.setSimpleLogger(new DefaultSimpleLogger());
+        eventDataCallbackHandler.putEventDataRunner(initConfiguration.getApplicationId(), eventDataRunner);
     }
 
     /**
@@ -49,6 +63,7 @@ public class InitEndpoint {
     private void cacheEndpoint(String discoveryEndpoint) throws IOException {
         String discoverEndpointInfo = HttpConnectUtil.doGetConnect(discoveryEndpoint);
         EndpointContext endpointContext = JSON.parseObject(discoverEndpointInfo, EndpointContext.class);
-        cacheManager.setCache(customOidcConfiguration.getIssuer(), endpointContext);
+        final InitConfiguration.OidcConfig oidcConfig = initConfiguration.getOidcConfig();
+        cacheManager.setCache(oidcConfig.getIssuer(), endpointContext);
     }
 }

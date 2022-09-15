@@ -7,7 +7,7 @@ package com.aliyunidaas.sample.common.factory;
  * @date: 2022/6/30 11:39 AM
  * @author: longqiuling
  **/
-public class ParameterNameFactory {
+public class ConstantParams {
 
     public static final String AUTHORIZATION_CODE = "authorization_code";
 
@@ -62,5 +62,19 @@ public class ParameterNameFactory {
     public final static String REDIRECT_URI_IS_NULL = "redirectUri is null, please fill the value in application.yaml ";
 
     public final static String REDIRECT_URI_IS_VALID = "redirectUri is valid, please fill the custom.serverDomain value in application.yaml ";
+
+    public final static String CALLBACK_URI_IS_NULL = "callbackUri is null, please fill the value in application.yaml";
+
+    public final static String ENCRYPT_KEY_IS_NULL = "encryptKey is null, please fill the value in application.yaml";
+
+    public final static String CALLBACK_URI_IS_VALID = "callbackUri is valid, please fill the value in application.yaml";
+
+    public final static String JWKS_URI_IS_NULL = "jwksUri is null, please fill the value in application.yaml";
+
+    public final static String JWKS_URI_IS_VALID = "jwksUri is valid, please fill the value in application.yaml";
+
+    public static final String AUD = "aud";
+
+    public static final String EXCEED_MAX_CYCLES_NUM = "the totalCount is too big, Please increase the number of cycles. The current number is 10000.";
 
 }

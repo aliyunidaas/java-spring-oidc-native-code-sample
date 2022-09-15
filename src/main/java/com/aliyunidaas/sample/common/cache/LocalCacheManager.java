@@ -18,11 +18,11 @@ public class LocalCacheManager implements CacheManager {
 
     private final Cache<String, Object> cache = CacheBuilder
             .newBuilder()
-            //设置cache的初始大小
+            // 设置cache的初始大小
             .initialCapacity(20)
-            //并发数
+            // 并发数
             .concurrencyLevel(2)
-            //过期时间
+            // 过期时间
             .expireAfterWrite(3600, TimeUnit.SECONDS)
             .build();
 

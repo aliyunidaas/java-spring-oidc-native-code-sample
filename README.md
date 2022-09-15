@@ -72,3 +72,88 @@ idaas:
 PKCE可以防止攻击者窃取code，从而通过code去拿到令牌。主要流程如下：
 ![img_14.png](src/main/resources/static/img/img_14.png)
 SP登录与IdP发起的登录可参考授权码流。
+
+# 用户/组织全量拉取
+## 1. developer API依赖
+```pom
+  <dependency>
+    <groupId>com.aliyun</groupId>
+    <artifactId>alibabacloud-eiam_developerapi20220225</artifactId>
+    <version><请替换成最新版本></version>
+  </dependency>
+```
+## 2. 相关配置
+(1)全量拉取需要配置拉取的实例和应用以及需要拉取的范围，这里默认拉取IDaaS根节点下的所有用户和组织。实例ID和应用ID需要配置在配置项中。
+```yaml
+ idaas:
+  instance-id: # 实例ID
+  application-id: # 应用ID
+```
+(2)需要在IDaaS相应的应用打开API开放的接口以及相应的接口权限。如下图所示。
+![img.png](src/main/resources/static/img/img_16.png)
+## 3. 接口调用
+```http request
+POST http://127.0.0.1:8082/trigger_sync
+```
+Demo中采用H2内存数据库进行数据的存储，数据库表为user_info，ou_info，表结构如下所示：
+```sql
+create table user_info (
+    user_id varchar(255) not null, 
+    external_id varchar(255), 
+    external_ou_id varchar(255), 
+    ou_id varchar(255), 
+    phone_number varchar(255), 
+    phone_region varchar(255), 
+    user_email varchar(255), 
+    username varchar(255), 
+    primary key (user_id)
+)
+create index external_id_index on user_info (external_id)
+
+create table ou_info (
+    ou_id varchar(255) not null, 
+    ou_external_id varchar(255), 
+    ou_name varchar(255), 
+    parent_ou_id varchar(255), 
+    primary key (ou_id)
+ )
+create index ou_external_id_index on ou_info (ou_external_id)
+```
+备注：
+（1）避免在同步过程中移动组织、用户。以免目录结构出错， Demo中将external_id和ou_external_id，设置唯一索引，若发现同步过程中组织重复，则抛错回滚。
+（2）运行应用时该数据库若不存在则会进行新建，路径为./temp/data
+
+其中IDaaS与Demo中的字段映射如下所示，可以根据业务需求自行修改：
+
+| Demo字段  | user_id      | user_name              | phone_region|  phone_number | user_email | external_id | external_ou_id         |
+|---------|--------------|------------------------|----------------------------|---------------|------------|--------------|------------------------|
+| IDaaS字段 |    external_id   | user_name|phone_region| phone_number  | email        | user_id    | organizational_unit_id |
+
+
+
+| Demo字段  | ou_id                           | ou_external_id              | ou_name                  | parent_ou_id | 
+|---------|---------------------------------|------------------------|--------------------------|--------------|
+| IDaaS字段 | organizational_unit_external_id | organizational_unit_id| organizational_unit_name | parent_id    |
+
+# IDaaS账户/组织同步到Demo应用
+## 1.  相关配置信息
+```yaml
+ idaas:
+   syncConfig:
+     enabled: true #同步到账户开关是否开启
+     callback-uri: ${custom.server-domain}/receive_sync #同步回调接收地址
+     encrypt-required: true #是否加密传输
+     encrypt-key: #IDaaS应用中对应的加密密钥
+     jwks-uri:  #IDaaS应用中账户同步中对应的验签公钥端点
+
+```
+(1) 在IDaaS中注册的应用需要打开IDaaS同步到应用的开关
+![img_1.png](src/main/resources/static/img/img_17.png)
+(2) 在IDaaS中设置同步范围，业务是否解密等信息,同时设置同步接收地址为当前demo中的${custom.server-domain}/receive_sync,即http://127.0.0.1:8082/receive_sync
+![img_2.png](src/main/resources/static/img/img_18.png)
+(3) 在IDaaS中设置回调事件以及全量推送范围
+![img_3.png](src/main/resources/static/img/img_19.png)
+## 2.接口调用
+```http request
+POST http://127.0.0.1:8082/receive_sync?event=<your event>
+```

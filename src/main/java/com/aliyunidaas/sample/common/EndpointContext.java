@@ -24,28 +24,28 @@ public class EndpointContext {
         return authorizationEndpoint;
     }
 
-    public void setAuthorizationEndpoint(String authorizationEndpoint) {
-        this.authorizationEndpoint = authorizationEndpoint;
-    }
-
     public String getTokenEndpoint() {
         return tokenEndpoint;
-    }
-
-    public void setTokenEndpoint(String tokenEndpoint) {
-        this.tokenEndpoint = tokenEndpoint;
     }
 
     public String getUserinfoEndpoint() {
         return userinfoEndpoint;
     }
 
-    public void setUserinfoEndpoint(String userinfoEndpoint) {
-        this.userinfoEndpoint = userinfoEndpoint;
-    }
-
     public String getJwksUri() {
         return jwksUri;
+    }
+
+    public void setAuthorizationEndpoint(String authorizationEndpoint) {
+        this.authorizationEndpoint = authorizationEndpoint;
+    }
+
+    public void setTokenEndpoint(String tokenEndpoint) {
+        this.tokenEndpoint = tokenEndpoint;
+    }
+
+    public void setUserinfoEndpoint(String userinfoEndpoint) {
+        this.userinfoEndpoint = userinfoEndpoint;
     }
 
     public void setJwksUri(String jwksUri) {

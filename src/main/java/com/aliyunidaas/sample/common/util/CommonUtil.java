@@ -24,7 +24,10 @@ public class CommonUtil {
     }
 
     public static String generateCacheKey(String randomValue, String name) {
-        return String.format("%s(%s)", name, randomValue);
+        return String.format("%s:%s:", name, randomValue);
     }
 
+    public static String generateCacheKey(String instanceId, String applicationId, String object) {
+        return String.format("%s:%s:%s:", instanceId, applicationId, object);
+    }
 }
